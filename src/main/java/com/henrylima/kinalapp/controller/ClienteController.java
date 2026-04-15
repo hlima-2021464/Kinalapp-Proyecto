@@ -1,6 +1,6 @@
 package com.henrylima.kinalapp.controller;
 
-import com.henrylima.kinalapp.Service.IClienteService;
+import com.henrylima.kinalapp.service.IClienteService;
 import com.henrylima.kinalapp.entity.Cliente;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
