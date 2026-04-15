@@ -25,29 +25,29 @@ public class UsuarioWebController {
     @GetMapping
     public String listar(Model model, HttpSession session) {
         if (!sesionValida(session)) return "redirect:/login";
-
+        
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         model.addAttribute("usuario", usuario);
         model.addAttribute("usuarios", usuarioService.listarUsuarios());
-        return "usuarios/listar";
+        return "listarUsuarios";
     }
 
     @GetMapping("/nuevo")
     public String formularioNuevo(Model model, HttpSession session) {
         if (!sesionValida(session)) return "redirect:/login";
-
+        
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         model.addAttribute("usuario", usuario);
         model.addAttribute("usuarioForm", new Usuario());
-        return "usuarios/form";
+        return "formUsuarios";
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute("usuarioForm") Usuario usuarioForm,
-                          RedirectAttributes redirect,
+    public String guardar(@ModelAttribute("usuarioForm") Usuario usuarioForm, 
+                          RedirectAttributes redirect, 
                           HttpSession session) {
         if (!sesionValida(session)) return "redirect:/login";
-
+        
         try {
             usuarioService.guardar(usuarioForm);
             redirect.addFlashAttribute("mensaje", "Usuario guardado exitosamente");
@@ -58,19 +58,19 @@ public class UsuarioWebController {
     }
 
     @GetMapping("/editar/{codigo}")
-    public String formularioEditar(@PathVariable Long codigo,
-                                   Model model,
+    public String formularioEditar(@PathVariable Long codigo, 
+                                   Model model, 
                                    HttpSession session,
                                    RedirectAttributes redirect) {
         if (!sesionValida(session)) return "redirect:/login";
-
+        
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         model.addAttribute("usuario", usuario);
-
+        
         return usuarioService.buscarPorCodigo(codigo)
                 .map(u -> {
                     model.addAttribute("usuarioForm", u);
-                    return "usuarios/form";
+                    return "formUsuarios";
                 })
                 .orElseGet(() -> {
                     redirect.addFlashAttribute("error", "Usuario no encontrado");
@@ -79,11 +79,11 @@ public class UsuarioWebController {
     }
 
     @GetMapping("/eliminar/{codigo}")
-    public String eliminar(@PathVariable Long codigo,
-                           RedirectAttributes redirect,
+    public String eliminar(@PathVariable Long codigo, 
+                           RedirectAttributes redirect, 
                            HttpSession session) {
         if (!sesionValida(session)) return "redirect:/login";
-
+        
         try {
             usuarioService.eliminar(codigo);
             redirect.addFlashAttribute("mensaje", "Usuario eliminado exitosamente");
