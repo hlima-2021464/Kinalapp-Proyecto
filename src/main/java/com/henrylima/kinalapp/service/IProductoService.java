@@ -1,4 +1,4 @@
-package com.henrylima.kinalapp.Service;
+package com.henrylima.kinalapp.service;
 
 import com.henrylima.kinalapp.entity.Producto;
 
