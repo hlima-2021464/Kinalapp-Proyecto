@@ -1,8 +1,8 @@
-package com.henrylima.kinalapp.Service;
+package com.henrylima.kinalapp.service;
 
 import com.henrylima.kinalapp.entity.Usuario;
 import com.henrylima.kinalapp.repository.UsuarioRepository;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.service;
 
 import java.util.List;
 import java.util.Optional;
