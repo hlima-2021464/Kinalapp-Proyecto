@@ -28,14 +28,14 @@ public class ProductoService implements IProductoService {
     @Override
     @Transactional(readOnly = true)
     public Optional<Producto> buscarPorCodigo(Long codigoProducto) {
-        return productoRepository.findById(Long.valueOf(codigoProducto));
+        return productoRepository.findById(codigoProducto);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Producto> listarPorEstado(int estado) {
         return listarProductos().stream()
-                .filter(p -> p.getEstado() == estado)
+                .filter(p -> p.getEstado() != null && p.getEstado() == estado)
                 .toList();
     }
 
@@ -59,13 +59,12 @@ public class ProductoService implements IProductoService {
     public Producto guardar(Producto producto) {
         validarProducto(producto);
 
-        if (producto.getEstado() == null || producto.getEstado() == 0) {
-            producto.setEstado(1L);
+        if (producto.getEstado() == null) {
+            producto.setEstado(1);  // ← Cambiado de 1L a 1
         }
 
         return productoRepository.save(producto);
     }
-
 
     @Override
     public Producto actualizar(Long codigoProducto, Producto producto) {
