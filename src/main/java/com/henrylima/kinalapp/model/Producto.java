@@ -20,12 +20,12 @@ public class Producto {
 
     private Long stock;
 
-    private Long estado;
+    private Integer estado; 
 
     public Producto() {
     }
 
-    public Producto(String nombreProducto, BigDecimal precio, Long stock, Long estado) {
+    public Producto(String nombreProducto, BigDecimal precio, Long stock, Integer estado) {
         this.nombreProducto = nombreProducto;
         this.precio = precio;
         this.stock = stock;
@@ -64,11 +64,11 @@ public class Producto {
         this.stock = stock;
     }
 
-    public Long getEstado() {
+    public Integer getEstado() {
         return estado;
     }
 
-    public void setEstado(Long estado) {
+    public void setEstado(Integer estado) {
         this.estado = estado;
     }
 }
