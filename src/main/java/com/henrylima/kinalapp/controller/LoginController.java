@@ -2,6 +2,7 @@ package com.henrylima.kinalapp.controller;
 
 import com.henrylima.kinalapp.Service.IUsuarioService;
 import com.henrylima.kinalapp.entity.Usuario;
+import com.henrylima.kinalapp.repository.UsuarioRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,9 +16,11 @@ import java.util.Optional;
 public class LoginController {
 
     private final IUsuarioService usuarioService;
+    private final UsuarioRepository usuarioRepository;
 
-    public LoginController(IUsuarioService usuarioService) {
+    public LoginController(IUsuarioService usuarioService, UsuarioRepository usuarioRepository) {
         this.usuarioService = usuarioService;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @GetMapping("/login")
@@ -30,25 +33,36 @@ public class LoginController {
                                @RequestParam String password,
                                HttpSession session,
                                Model model) {
-
-        Optional<Usuario> usuarioOpt = usuarioService.listarUsuarios()
-                .stream()
-                .filter(u -> u.getUsername().equals(username) &&
-                        u.getPassword().equals(password))
-                .findFirst();
-
-        if (usuarioOpt.isPresent() && usuarioOpt.get().getEstado() == 1) {
-            session.setAttribute("usuarioLogueado", usuarioOpt.get());
-            return "redirect:/dashboard";
+        
+        // Buscar por username exacto
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByUsername(username);
+        
+        if (usuarioOpt.isPresent()) {
+            Usuario usuario = usuarioOpt.get();
+            
+            // Verificar password (en producción usar BCrypt)
+            if (usuario.getPassword().equals(password)) {
+                
+                // Verificar estado
+                if (usuario.getEstado() == 1) {
+                    session.setAttribute("usuarioLogueado", usuario);
+                    return "redirect:/dashboard";
+                } else {
+                    model.addAttribute("error", "⚠️ Usuario inactivo. Contacte al administrador.");
+                }
+            } else {
+                model.addAttribute("error", "❌ Contraseña incorrecta");
+            }
         } else {
-            model.addAttribute("error", "Credenciales inválidas o usuario inactivo");
-            return "login";
+            model.addAttribute("error", "❌ Usuario no encontrado");
         }
+        
+        return "login";
     }
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
-        return "redirect:/login";
+        return "redirect:/login?logout";
     }
 }
