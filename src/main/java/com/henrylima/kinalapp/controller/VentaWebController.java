@@ -28,27 +28,27 @@ public class VentaWebController {
     @GetMapping
     public String listar(Model model, HttpSession session) {
         if (!sesionValida(session)) return "redirect:/login";
-
+        
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         model.addAttribute("usuario", usuario);
         model.addAttribute("ventas", ventaService.listarVentas());
-        return "ventas/listar";
+        return "listarVentas";
     }
 
     @GetMapping("/ver/{codigo}")
-    public String verDetalle(@PathVariable Long codigo,
-                             Model model,
+    public String verDetalle(@PathVariable Long codigo, 
+                             Model model, 
                              HttpSession session,
                              RedirectAttributes redirect) {
         if (!sesionValida(session)) return "redirect:/login";
-
+        
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         model.addAttribute("usuario", usuario);
-
+        
         return ventaService.buscarPorCodigo(codigo)
                 .map(venta -> {
                     model.addAttribute("venta", venta);
-                    return "ventas/detalle";
+                    return "detalleVentas";
                 })
                 .orElseGet(() -> {
                     redirect.addFlashAttribute("error", "Venta no encontrada");
@@ -56,14 +56,13 @@ public class VentaWebController {
                 });
     }
 
-    // NO SE PERMITE EDITAR NI ELIMINAR VENTAS
     @GetMapping("/eliminar/{codigo}")
-    public String eliminarBloqueado(@PathVariable Long codigo,
-                                    RedirectAttributes redirect,
+    public String eliminarBloqueado(@PathVariable Long codigo, 
+                                    RedirectAttributes redirect, 
                                     HttpSession session) {
         if (!sesionValida(session)) return "redirect:/login";
-
-        redirect.addFlashAttribute("error", " BOTÓN NO DISPONIBLE - Las ventas no se pueden eliminar");
+        
+        redirect.addFlashAttribute("error", "⛔ BOTÓN NO DISPONIBLE - Las ventas no se pueden eliminar");
         return "redirect:/web/ventas";
     }
 }
