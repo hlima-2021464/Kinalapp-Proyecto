@@ -1,6 +1,6 @@
 package com.henrylima.kinalapp.controller;
 
-import com.henrylima.kinalapp.service.IProductoService;
+import com.henrylima.kinalapp.Service.IProductoService;
 import com.henrylima.kinalapp.entity.Producto;
 import com.henrylima.kinalapp.entity.Usuario;
 import jakarta.servlet.http.HttpSession;
@@ -26,29 +26,29 @@ public class ProductoWebController {
     @GetMapping
     public String listar(Model model, HttpSession session) {
         if (!sesionValida(session)) return "redirect:/login";
-
+        
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         model.addAttribute("usuario", usuario);
         model.addAttribute("productos", productoService.listarProductos());
-        return "productos/listar";
+        return "listarProductos";
     }
 
     @GetMapping("/nuevo")
     public String formularioNuevo(Model model, HttpSession session) {
         if (!sesionValida(session)) return "redirect:/login";
-
+        
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         model.addAttribute("usuario", usuario);
         model.addAttribute("producto", new Producto());
-        return "productos/form";
+        return "formProductos";
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Producto producto,
-                          RedirectAttributes redirect,
+    public String guardar(@ModelAttribute Producto producto, 
+                          RedirectAttributes redirect, 
                           HttpSession session) {
         if (!sesionValida(session)) return "redirect:/login";
-
+        
         try {
             productoService.guardar(producto);
             redirect.addFlashAttribute("mensaje", "Producto guardado exitosamente");
@@ -59,19 +59,19 @@ public class ProductoWebController {
     }
 
     @GetMapping("/editar/{codigo}")
-    public String formularioEditar(@PathVariable Long codigo,
-                                   Model model,
+    public String formularioEditar(@PathVariable Long codigo, 
+                                   Model model, 
                                    HttpSession session,
                                    RedirectAttributes redirect) {
         if (!sesionValida(session)) return "redirect:/login";
-
+        
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         model.addAttribute("usuario", usuario);
-
+        
         return productoService.buscarPorCodigo(codigo)
                 .map(producto -> {
                     model.addAttribute("producto", producto);
-                    return "productos/form";
+                    return "formProductos";
                 })
                 .orElseGet(() -> {
                     redirect.addFlashAttribute("error", "Producto no encontrado");
@@ -80,11 +80,11 @@ public class ProductoWebController {
     }
 
     @GetMapping("/eliminar/{codigo}")
-    public String eliminar(@PathVariable Long codigo,
-                           RedirectAttributes redirect,
+    public String eliminar(@PathVariable Long codigo, 
+                           RedirectAttributes redirect, 
                            HttpSession session) {
         if (!sesionValida(session)) return "redirect:/login";
-
+        
         try {
             productoService.eliminar(codigo);
             redirect.addFlashAttribute("mensaje", "Producto eliminado exitosamente");
