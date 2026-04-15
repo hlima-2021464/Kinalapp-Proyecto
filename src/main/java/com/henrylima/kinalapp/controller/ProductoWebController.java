@@ -1,6 +1,6 @@
 package com.henrylima.kinalapp.controller;
 
-import com.henrylima.kinalapp.Service.IProductoService;
+import com.henrylima.kinalapp.service.IProductoService;
 import com.henrylima.kinalapp.entity.Producto;
 import com.henrylima.kinalapp.entity.Usuario;
 import jakarta.servlet.http.HttpSession;
