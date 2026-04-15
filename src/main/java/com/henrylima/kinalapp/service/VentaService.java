@@ -2,7 +2,7 @@ package com.henrylima.kinalapp.service;
 
 import com.henrylima.kinalapp.entity.Venta;
 import com.henrylima.kinalapp.repository.VentaRepository;
-import org.springframework.stereotype.service;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
