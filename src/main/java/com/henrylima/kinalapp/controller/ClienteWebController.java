@@ -1,6 +1,6 @@
 package com.henrylima.kinalapp.controller;
 
-import com.henrylima.kinalapp.Service.IClienteService;
+import com.henrylima.kinalapp.service.IClienteService;
 import com.henrylima.kinalapp.entity.Cliente;
 import com.henrylima.kinalapp.entity.Usuario;
 import jakarta.servlet.http.HttpSession;
@@ -26,29 +26,29 @@ public class ClienteWebController {
     @GetMapping
     public String listar(Model model, HttpSession session) {
         if (!sesionValida(session)) return "redirect:/login";
-
+        
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         model.addAttribute("usuario", usuario);
         model.addAttribute("clientes", clienteService.listarClientes());
-        return "clientes/listar";
+        return "listar";  // ← Cambiado de "clientes/listar" a "listar"
     }
 
     @GetMapping("/nuevo")
     public String formularioNuevo(Model model, HttpSession session) {
         if (!sesionValida(session)) return "redirect:/login";
-
+        
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         model.addAttribute("usuario", usuario);
         model.addAttribute("cliente", new Cliente());
-        return "clientes/form";
+        return "form";  // ← Cambiado de "clientes/form" a "form"
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Cliente cliente,
-                          RedirectAttributes redirect,
+    public String guardar(@ModelAttribute Cliente cliente, 
+                          RedirectAttributes redirect, 
                           HttpSession session) {
         if (!sesionValida(session)) return "redirect:/login";
-
+        
         try {
             clienteService.guardar(cliente);
             redirect.addFlashAttribute("mensaje", "Cliente guardado exitosamente");
@@ -59,19 +59,19 @@ public class ClienteWebController {
     }
 
     @GetMapping("/editar/{dpi}")
-    public String formularioEditar(@PathVariable String dpi,
-                                   Model model,
+    public String formularioEditar(@PathVariable String dpi, 
+                                   Model model, 
                                    HttpSession session,
                                    RedirectAttributes redirect) {
         if (!sesionValida(session)) return "redirect:/login";
-
+        
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         model.addAttribute("usuario", usuario);
-
+        
         return clienteService.buscarPorDPI(dpi)
                 .map(cliente -> {
                     model.addAttribute("cliente", cliente);
-                    return "clientes/form";
+                    return "form";  // ← Cambiado de "clientes/form" a "form"
                 })
                 .orElseGet(() -> {
                     redirect.addFlashAttribute("error", "Cliente no encontrado");
@@ -80,11 +80,11 @@ public class ClienteWebController {
     }
 
     @GetMapping("/eliminar/{dpi}")
-    public String eliminar(@PathVariable String dpi,
-                           RedirectAttributes redirect,
+    public String eliminar(@PathVariable String dpi, 
+                           RedirectAttributes redirect, 
                            HttpSession session) {
         if (!sesionValida(session)) return "redirect:/login";
-
+        
         try {
             clienteService.eliminar(dpi);
             redirect.addFlashAttribute("mensaje", "Cliente eliminado exitosamente");
