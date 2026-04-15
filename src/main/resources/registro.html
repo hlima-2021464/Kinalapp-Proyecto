@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - KinalApp</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white text-center">
+                    <h3><i class="bi bi-person-plus-fill"></i> Registro de Usuario</h3>
+                </div>
+                <div class="card-body">
+                    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+                    <form th:action="@{/registro}" method="post" th:object="${usuario}">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Nombre de Usuario *</label>
+                            <input type="text" class="form-control" id="username" th:field="*{username}"
+                                   required minlength="3" maxlength="45">
+                            <small class="text-muted">Mínimo 3 caracteres</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Contraseña *</label>
+                            <input type="password" class="form-control" id="password" th:field="*{password}"
+                                   required minlength="4" maxlength="45">
+                            <small class="text-muted">Mínimo 4 caracteres</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Confirmar Contraseña *</label>
+                            <input type="password" class="form-control" id="confirmPassword"
+                                   required oninput="validarPassword()">
+                            <div id="passwordFeedback" class="invalid-feedback"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Correo Electrónico *</label>
+                            <input type="email" class="form-control" id="email" th:field="*{email}"
+                                   required maxlength="60">
+                        </div>
+
+                        <hr>
+                        <small class="text-muted">* Campos obligatorios</small>
+
+                        <div class="d-grid gap-2 mt-3">
+                            <button type="submit" class="btn btn-success" id="btnRegistrar">
+                                <i class="bi bi-check-circle"></i> Registrarse
+                            </button>
+                            <a href="/login" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Volver al Login
+                            </a>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center text-muted">
+                    <small>© 2024 KinalApp - Todos los derechos reservados</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function validarPassword() {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const feedback = document.getElementById('passwordFeedback');
+        const confirmInput = document.getElementById('confirmPassword');
+        const btnRegistrar = document.getElementById('btnRegistrar');
+
+        if (password !== confirmPassword) {
+            confirmInput.classList.add('is-invalid');
+            feedback.textContent = 'Las contraseñas no coinciden';
+            btnRegistrar.disabled = true;
+            return false;
+        } else {
+            confirmInput.classList.remove('is-invalid');
+            confirmInput.classList.add('is-valid');
+            feedback.textContent = '';
+            btnRegistrar.disabled = false;
+            return true;
+        }
+    }
+
+    // Validar antes de enviar
+    document.querySelector('form').addEventListener('submit', function(e) {
+        if (!validarPassword()) {
+            e.preventDefault();
+            alert('⚠️ Las contraseñas no coinciden');
+        }
+    });
+</script>
+</body>
+</html>
