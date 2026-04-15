@@ -1,6 +1,6 @@
 package com.henrylima.kinalapp.controller;
 
-import com.henrylima.kinalapp.Service.IUsuarioService;
+import com.henrylima.kinalapp.service.IUsuarioService;
 import com.henrylima.kinalapp.entity.Usuario;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
