@@ -1,7 +1,7 @@
 package com.henrylima.kinalapp.controller;
 
 import com.henrylima.kinalapp.entity.DetalleVenta;
-import com.henrylima.kinalapp.Service.IDetalleVentaService;
+import com.henrylima.kinalapp.service.IDetalleVentaService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
