@@ -1,6 +1,6 @@
 package com.henrylima.kinalapp.service;
 
-import com.henrylima.kinalapp.Service.IClienteService;
+import com.henrylima.kinalapp.service.IClienteService;
 import com.henrylima.kinalapp.entity.Cliente;
 import com.henrylima.kinalapp.repository.ClienteRepository;
 import org.springframework.stereotype.Service;

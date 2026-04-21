@@ -9,7 +9,7 @@ public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo_usuario")
-    private long codigoUsuario;
+    private Long codigoUsuario;
 
     @Column(name = "username", length = 45)
     private String username;
@@ -24,14 +24,14 @@ public class Usuario {
     private String rol;
 
     @Column(name = "estado")
-    private int estado;
+    private Integer estado;
 
     // Constructor vacío
     public Usuario(){
     }
 
     // Constructor con parámetros
-    public Usuario(String username, String password, String email, String rol, int estado){
+    public Usuario(String username, String password, String email, String rol, Integer estado){
         this.username = username;
         this.password = password;
         this.email = email;
@@ -39,11 +39,11 @@ public class Usuario {
         this.estado = estado;
     }
 
-    public long getCodigoUsuario() {
+    public Long getCodigoUsuario() {
         return codigoUsuario;
     }
 
-    public void setCodigoUsuario(Integer codigoUsuario) {
+    public void setCodigoUsuario(Long codigoUsuario) {
         this.codigoUsuario = codigoUsuario;
     }
 
@@ -79,12 +79,11 @@ public class Usuario {
         this.rol = rol;
     }
 
-    public int getEstado() {
+    public Integer getEstado() {
         return estado;
     }
 
-    public void setEstado(int estado) {
+    public void setEstado(Integer estado) {
         this.estado = estado;
     }
 }
-
