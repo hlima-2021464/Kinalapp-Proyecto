@@ -1,54 +1,46 @@
 package com.henrylima.kinalapp.controller;
 
-import com.henrylima.kinalapp.Service.IProductoService;
+import com.henrylima.kinalapp.service.IProductoService;
 import com.henrylima.kinalapp.entity.Producto;
 import com.henrylima.kinalapp.entity.Usuario;
-import jakarta.servlet.http.HttpSession;
+import com.henrylima.kinalapp.repository.UsuarioRepository;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/web/productos")
 public class ProductoWebController {
 
     private final IProductoService productoService;
+    private final UsuarioRepository usuarioRepository;
 
-    public ProductoWebController(IProductoService productoService) {
+    public ProductoWebController(IProductoService productoService, UsuarioRepository usuarioRepository) {
         this.productoService = productoService;
-    }
-
-    private boolean sesionValida(HttpSession session) {
-        return session.getAttribute("usuarioLogueado") != null;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @GetMapping
-    public String listar(Model model, HttpSession session) {
-        if (!sesionValida(session)) return "redirect:/login";
-        
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        model.addAttribute("usuario", usuario);
+    public String listar(Model model, Authentication authentication) {
+        cargarUsuario(authentication, model);
         model.addAttribute("productos", productoService.listarProductos());
         return "listarProductos";
     }
 
     @GetMapping("/nuevo")
-    public String formularioNuevo(Model model, HttpSession session) {
-        if (!sesionValida(session)) return "redirect:/login";
-        
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        model.addAttribute("usuario", usuario);
+    public String formularioNuevo(Model model, Authentication authentication) {
+        cargarUsuario(authentication, model);
         model.addAttribute("producto", new Producto());
         return "formProductos";
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Producto producto, 
-                          RedirectAttributes redirect, 
-                          HttpSession session) {
-        if (!sesionValida(session)) return "redirect:/login";
-        
+    public String guardar(@ModelAttribute Producto producto,
+                          RedirectAttributes redirect) {
         try {
             productoService.guardar(producto);
             redirect.addFlashAttribute("mensaje", "Producto guardado exitosamente");
@@ -59,15 +51,12 @@ public class ProductoWebController {
     }
 
     @GetMapping("/editar/{codigo}")
-    public String formularioEditar(@PathVariable Long codigo, 
-                                   Model model, 
-                                   HttpSession session,
+    public String formularioEditar(@PathVariable Long codigo,
+                                   Model model,
+                                   Authentication authentication,
                                    RedirectAttributes redirect) {
-        if (!sesionValida(session)) return "redirect:/login";
-        
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        model.addAttribute("usuario", usuario);
-        
+        cargarUsuario(authentication, model);
+
         return productoService.buscarPorCodigo(codigo)
                 .map(producto -> {
                     model.addAttribute("producto", producto);
@@ -80,11 +69,8 @@ public class ProductoWebController {
     }
 
     @GetMapping("/eliminar/{codigo}")
-    public String eliminar(@PathVariable Long codigo, 
-                           RedirectAttributes redirect, 
-                           HttpSession session) {
-        if (!sesionValida(session)) return "redirect:/login";
-        
+    public String eliminar(@PathVariable Long codigo,
+                           RedirectAttributes redirect) {
         try {
             productoService.eliminar(codigo);
             redirect.addFlashAttribute("mensaje", "Producto eliminado exitosamente");
@@ -92,5 +78,12 @@ public class ProductoWebController {
             redirect.addFlashAttribute("error", "Error al eliminar: " + e.getMessage());
         }
         return "redirect:/web/productos";
+    }
+
+    private void cargarUsuario(Authentication authentication, Model model) {
+        if (authentication != null) {
+            Optional<Usuario> usuarioOpt = usuarioRepository.findByUsername(authentication.getName());
+            usuarioOpt.ifPresent(usuario -> model.addAttribute("usuario", usuario));
+        }
     }
 }
