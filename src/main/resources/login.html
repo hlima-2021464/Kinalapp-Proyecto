@@ -16,8 +16,13 @@
                     <h3><i class="bi bi-lock-fill"></i> KinalApp</h3>
                 </div>
                 <div class="card-body">
+                    <div th:if="${param.error}" class="alert alert-danger">
+                        ❌ Usuario o contraseña incorrectos
+                    </div>
+                    <div th:if="${param.logout}" class="alert alert-success">
+                        ✅ Has cerrado sesión correctamente
+                    </div>
                     <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
-                    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
                     <form th:action="@{/login}" method="post">
                         <div class="mb-3">
@@ -43,7 +48,7 @@
                     </div>
                 </div>
                 <div class="card-footer text-center text-muted">
-                    <small>© 2024 KinalApp - Todos los derechos reservados</small>
+                    <small>© 2026 Fundación Kinal - Todos los derechos reservados</small>
                 </div>
             </div>
         </div>
