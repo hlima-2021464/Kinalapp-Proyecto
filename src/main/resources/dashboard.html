@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,13 +11,17 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="/dashboard">🏠 KinalApp</a>
+        <a class="navbar-brand" href="/dashboard">
+            <img src="/img/kinalapplogo.png" alt="KinalApp" style="height: 30px;" class="me-2">
+            KinalApp
+        </a>
         <div class="navbar-nav ms-auto">
                 <span class="navbar-text me-3">
-                    👤 <span th:text="${usuario.username}"></span>
-                    <span class="badge bg-info" th:text="${usuario.rol}"></span>
+                    👤 <span sec:authentication="name">Usuario</span>
                 </span>
-            <a class="btn btn-outline-light btn-sm" href="/logout">🚪 Cerrar Sesión</a>
+            <form th:action="@{/logout}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-outline-light btn-sm">🚪 Cerrar Sesión</button>
+            </form>
         </div>
     </div>
 </nav>
