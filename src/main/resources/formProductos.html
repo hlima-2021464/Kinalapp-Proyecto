@@ -12,7 +12,9 @@
         <a class="navbar-brand" href="/dashboard">🏠 KinalApp</a>
         <div class="navbar-nav ms-auto">
             <span class="navbar-text me-3">👤 <span th:text="${usuario.username}"></span></span>
-            <a class="btn btn-outline-light btn-sm" href="/logout">🚪 Salir</a>
+            <form th:action="@{/logout}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-outline-light btn-sm">🚪 Salir</button>
+            </form>
         </div>
     </div>
 </nav>
