@@ -2,52 +2,44 @@ package com.henrylima.kinalapp.controller;
 
 import com.henrylima.kinalapp.service.IUsuarioService;
 import com.henrylima.kinalapp.entity.Usuario;
-import jakarta.servlet.http.HttpSession;
+import com.henrylima.kinalapp.repository.UsuarioRepository;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/web/usuarios")
 public class UsuarioWebController {
 
     private final IUsuarioService usuarioService;
+    private final UsuarioRepository usuarioRepository;
 
-    public UsuarioWebController(IUsuarioService usuarioService) {
+    public UsuarioWebController(IUsuarioService usuarioService, UsuarioRepository usuarioRepository) {
         this.usuarioService = usuarioService;
-    }
-
-    private boolean sesionValida(HttpSession session) {
-        return session.getAttribute("usuarioLogueado") != null;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @GetMapping
-    public String listar(Model model, HttpSession session) {
-        if (!sesionValida(session)) return "redirect:/login";
-        
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        model.addAttribute("usuario", usuario);
+    public String listar(Model model, Authentication authentication) {
+        cargarUsuario(authentication, model);
         model.addAttribute("usuarios", usuarioService.listarUsuarios());
         return "listarUsuarios";
     }
 
     @GetMapping("/nuevo")
-    public String formularioNuevo(Model model, HttpSession session) {
-        if (!sesionValida(session)) return "redirect:/login";
-        
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        model.addAttribute("usuario", usuario);
+    public String formularioNuevo(Model model, Authentication authentication) {
+        cargarUsuario(authentication, model);
         model.addAttribute("usuarioForm", new Usuario());
         return "formUsuarios";
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute("usuarioForm") Usuario usuarioForm, 
-                          RedirectAttributes redirect, 
-                          HttpSession session) {
-        if (!sesionValida(session)) return "redirect:/login";
-        
+    public String guardar(@ModelAttribute("usuarioForm") Usuario usuarioForm,
+                          RedirectAttributes redirect) {
         try {
             usuarioService.guardar(usuarioForm);
             redirect.addFlashAttribute("mensaje", "Usuario guardado exitosamente");
@@ -58,15 +50,12 @@ public class UsuarioWebController {
     }
 
     @GetMapping("/editar/{codigo}")
-    public String formularioEditar(@PathVariable Long codigo, 
-                                   Model model, 
-                                   HttpSession session,
+    public String formularioEditar(@PathVariable Long codigo,
+                                   Model model,
+                                   Authentication authentication,
                                    RedirectAttributes redirect) {
-        if (!sesionValida(session)) return "redirect:/login";
-        
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        model.addAttribute("usuario", usuario);
-        
+        cargarUsuario(authentication, model);
+
         return usuarioService.buscarPorCodigo(codigo)
                 .map(u -> {
                     model.addAttribute("usuarioForm", u);
@@ -79,11 +68,8 @@ public class UsuarioWebController {
     }
 
     @GetMapping("/eliminar/{codigo}")
-    public String eliminar(@PathVariable Long codigo, 
-                           RedirectAttributes redirect, 
-                           HttpSession session) {
-        if (!sesionValida(session)) return "redirect:/login";
-        
+    public String eliminar(@PathVariable Long codigo,
+                           RedirectAttributes redirect) {
         try {
             usuarioService.eliminar(codigo);
             redirect.addFlashAttribute("mensaje", "Usuario eliminado exitosamente");
@@ -91,5 +77,12 @@ public class UsuarioWebController {
             redirect.addFlashAttribute("error", "Error al eliminar: " + e.getMessage());
         }
         return "redirect:/web/usuarios";
+    }
+
+    private void cargarUsuario(Authentication authentication, Model model) {
+        if (authentication != null) {
+            Optional<Usuario> usuarioOpt = usuarioRepository.findByUsername(authentication.getName());
+            usuarioOpt.ifPresent(usuario -> model.addAttribute("usuario", usuario));
+        }
     }
 }

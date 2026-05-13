@@ -3,52 +3,44 @@ package com.henrylima.kinalapp.controller;
 import com.henrylima.kinalapp.service.IClienteService;
 import com.henrylima.kinalapp.entity.Cliente;
 import com.henrylima.kinalapp.entity.Usuario;
-import jakarta.servlet.http.HttpSession;
+import com.henrylima.kinalapp.repository.UsuarioRepository;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/web/clientes")
 public class ClienteWebController {
 
     private final IClienteService clienteService;
+    private final UsuarioRepository usuarioRepository;
 
-    public ClienteWebController(IClienteService clienteService) {
+    public ClienteWebController(IClienteService clienteService, UsuarioRepository usuarioRepository) {
         this.clienteService = clienteService;
-    }
-
-    private boolean sesionValida(HttpSession session) {
-        return session.getAttribute("usuarioLogueado") != null;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @GetMapping
-    public String listar(Model model, HttpSession session) {
-        if (!sesionValida(session)) return "redirect:/login";
-        
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        model.addAttribute("usuario", usuario);
+    public String listar(Model model, Authentication authentication) {
+        cargarUsuario(authentication, model);
         model.addAttribute("clientes", clienteService.listarClientes());
-        return "listar";  // ← Cambiado de "clientes/listar" a "listar"
+        return "listar";
     }
 
     @GetMapping("/nuevo")
-    public String formularioNuevo(Model model, HttpSession session) {
-        if (!sesionValida(session)) return "redirect:/login";
-        
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        model.addAttribute("usuario", usuario);
+    public String formularioNuevo(Model model, Authentication authentication) {
+        cargarUsuario(authentication, model);
         model.addAttribute("cliente", new Cliente());
-        return "form";  // ← Cambiado de "clientes/form" a "form"
+        return "form";
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Cliente cliente, 
-                          RedirectAttributes redirect, 
-                          HttpSession session) {
-        if (!sesionValida(session)) return "redirect:/login";
-        
+    public String guardar(@ModelAttribute Cliente cliente,
+                          RedirectAttributes redirect) {
         try {
             clienteService.guardar(cliente);
             redirect.addFlashAttribute("mensaje", "Cliente guardado exitosamente");
@@ -59,19 +51,16 @@ public class ClienteWebController {
     }
 
     @GetMapping("/editar/{dpi}")
-    public String formularioEditar(@PathVariable String dpi, 
-                                   Model model, 
-                                   HttpSession session,
+    public String formularioEditar(@PathVariable String dpi,
+                                   Model model,
+                                   Authentication authentication,
                                    RedirectAttributes redirect) {
-        if (!sesionValida(session)) return "redirect:/login";
-        
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        model.addAttribute("usuario", usuario);
-        
+        cargarUsuario(authentication, model);
+
         return clienteService.buscarPorDPI(dpi)
                 .map(cliente -> {
                     model.addAttribute("cliente", cliente);
-                    return "form";  // ← Cambiado de "clientes/form" a "form"
+                    return "form";
                 })
                 .orElseGet(() -> {
                     redirect.addFlashAttribute("error", "Cliente no encontrado");
@@ -80,11 +69,8 @@ public class ClienteWebController {
     }
 
     @GetMapping("/eliminar/{dpi}")
-    public String eliminar(@PathVariable String dpi, 
-                           RedirectAttributes redirect, 
-                           HttpSession session) {
-        if (!sesionValida(session)) return "redirect:/login";
-        
+    public String eliminar(@PathVariable String dpi,
+                           RedirectAttributes redirect) {
         try {
             clienteService.eliminar(dpi);
             redirect.addFlashAttribute("mensaje", "Cliente eliminado exitosamente");
@@ -92,5 +78,12 @@ public class ClienteWebController {
             redirect.addFlashAttribute("error", "Error al eliminar: " + e.getMessage());
         }
         return "redirect:/web/clientes";
+    }
+
+    private void cargarUsuario(Authentication authentication, Model model) {
+        if (authentication != null) {
+            Optional<Usuario> usuarioOpt = usuarioRepository.findByUsername(authentication.getName());
+            usuarioOpt.ifPresent(usuario -> model.addAttribute("usuario", usuario));
+        }
     }
 }
